@@ -1,5 +1,6 @@
-import { launch, LaunchOptions, Browser, Page } from 'puppeteer';
+import { LaunchOptions, Browser, Page } from 'puppeteer';
 import { ROOT_PATH, IS_HEADLESS } from './globals';
+const pptrFirefox = require('puppeteer-firefox');
 
 let browser: Browser;
 let isSpecialBrowser = false;
@@ -7,7 +8,8 @@ let isSpecialBrowser = false;
 async function launchBrowser(args?: object) {
   let configuration: LaunchOptions = {
     userDataDir: ROOT_PATH + 'data',
-    headless: IS_HEADLESS
+    headless: IS_HEADLESS,
+    slowMo:10
   };
 
   if (args) {
@@ -17,7 +19,7 @@ async function launchBrowser(args?: object) {
     };
   }
 
-  browser = await launch(configuration);
+  browser = await pptrFirefox.launch(configuration);
 }
 
 export async function getBrowser(): Promise<Browser> {

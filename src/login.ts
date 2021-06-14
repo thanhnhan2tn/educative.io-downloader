@@ -26,7 +26,7 @@ export async function isLoggedIn(): Promise<boolean> {
 
   const page = await getPage();
 
-  await page.goto(EDUCATIVE_BASE_URL, { timeout: HTTP_REQUEST_TIMEOUT, waitUntil: 'networkidle2' });
+  await page.goto(EDUCATIVE_BASE_URL, { timeout: HTTP_REQUEST_TIMEOUT });
 
   if (page.url() === `${EDUCATIVE_BASE_URL}/learn`) {
     return true;
@@ -53,10 +53,10 @@ export async function login(): Promise<void> {
   console.log('Loggin in');
 
   const page = await getPage();
-  // await page.setUserAgent(USER_AGENT);
-  await page.goto(EDUCATIVE_BASE_URL, { timeout: HTTP_REQUEST_TIMEOUT, waitUntil: 'networkidle2' });
+  await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36');
+  await page.goto(EDUCATIVE_BASE_URL, { timeout: HTTP_REQUEST_TIMEOUT});
 
-  const isLoginButtonClicked = await clickButton(page, 'MuiButton-label', 'Log in');
+  const isLoginButtonClicked = await clickButton(page, 'm-0 rounded-none p-4 h-full  text-default', 'Log in');
 
   if (!isLoginButtonClicked) {
     throw new Error('Could not find login button (open login form)');
@@ -68,21 +68,22 @@ export async function login(): Promise<void> {
   await page.type('[name=email]', EMAIL, { delay: 200 });
   await page.type('[name=password]', PASSWORD, { delay: 200 });
 
-  const clickLoginBtn = await clickButton(page, 'MuiButton-label', 'Login');
+  const clickLoginBtn = await clickButton(page, 'contained-primary w-full mt-12 mx-0', 'Login');
 
   if (!clickLoginBtn) {
     throw new Error('Could not find login button (login form submit)');
   }
 
-  const element = await page.waitForSelector(".b-status-control span", { timeout: 10000 });
+  const element = await page.waitForSelector(".b-status-control span", { timeout: 100000 });
   let label = await page.evaluate((el: HTMLSpanElement) => el.innerText, element);
 
   if (label === 'Logging in...') {
     try {
-      await page.waitForNavigation({ waitUntil: 'networkidle0' });
+      await page.waitForNavigation();
       await page.close();
       return;
     } catch (error) {
+      console.log(error)
       console.log('Could not log in');
       label = await page.$eval('.b-status-control span', (node) => node.innerHTML);
     }
@@ -101,6 +102,7 @@ async function clickButton(page: Page, className: string, buttonLabel: string): 
     const elements = document.getElementsByClassName(className);
 
     // tslint:disable-next-line: prefer-for-of
+    console.log(elements)
     for (let i = 0; i < elements.length; i++) {
       if (elements[i].innerHTML === buttonLabel) {
         (elements[i] as HTMLElement).click();
