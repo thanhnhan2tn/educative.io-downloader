@@ -53,7 +53,11 @@ export async function login(): Promise<void> {
   console.log('Loggin in');
 
   const page = await getPage();
+<<<<<<< HEAD
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36');
+=======
+  await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36');
+>>>>>>> 95bb57f07a0a199470de4de9f5a5b324d4a9ff3b
   await page.goto(EDUCATIVE_BASE_URL, { timeout: HTTP_REQUEST_TIMEOUT});
 
   const isLoginButtonClicked = await clickButton(page, 'm-0 rounded-none p-4 h-full  text-default', 'Log in');

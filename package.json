@@ -16,7 +16,11 @@
     "@types/config": "^0.0.36"
   },
   "scripts": {
+<<<<<<< HEAD
     "start": "npm run compile && node build/src/app.js",
+=======
+    "start": "node build/src/app.js",
+>>>>>>> 95bb57f07a0a199470de4de9f5a5b324d4a9ff3b
     "dev": "nodemon build/src/app.js",
     "compile": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
