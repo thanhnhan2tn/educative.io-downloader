@@ -22,14 +22,18 @@ export async function fetchAllCoursesAvailableToDownload(url: string, cursor: st
   const page = await getPage();
 
   await page.goto(url + cursor, { timeout: HTTP_REQUEST_TIMEOUT, waitUntil: 'networkidle0' });
-  await page.evaluate(() => {
-    localStorage.setItem('cookieConsent', 'true');
-  });
-  const response = await page.evaluate(() => {
-    return document.querySelector("body").innerText;
-  });
 
-  const availableCourses: AvailableCourses = JSON.parse(response);
+  const response = await page.evaluate(() => {
+    const body = document.querySelector("body").innerText;
+    return body;
+  });
+  let availableCourses: AvailableCourses;
+  try {
+    availableCourses = JSON.parse(response);
+  }
+  catch(error) {
+    console.log(error);
+  }
 
   for (const availableCourse of availableCourses.summaries) {
     if (availableCourse.discounted_price === 0.0 || availableCourse.owned_by_reader) {
@@ -48,6 +52,35 @@ export async function fetchAllCoursesAvailableToDownload(url: string, cursor: st
   }
 
   return COURSE_URL_SLUG_LIST;
+}
+
+export async function fetchAllCoursesInPathToDownload(url: string, cursor: string = ''): Promise<string[]> {
+
+  await getSpecialBrowser();
+
+  const page = await getPage();
+
+  await page.goto(url + cursor, { timeout: HTTP_REQUEST_TIMEOUT, waitUntil: 'networkidle0' });
+
+  const listSlugs = await page.evaluate(() => {
+    const list = [];
+    const listCourse = document.querySelectorAll("p[title='Module Title']");
+    listCourse.forEach((availableCourse) => {
+      const courseAnchor = availableCourse.closest('a.cursor-pointer');
+      if (courseAnchor) {
+        list.push(courseAnchor.getAttribute('href'));
+      }
+    });
+  
+    if (listCourse.length > 1) {
+      console.log(`Found ${listCourse.length} courses to download on this page.`);
+    } else {
+      console.log(`Found ${listCourse.length} course to download on this page.`);
+    }
+    return list;
+  });
+  
+  return listSlugs;
 }
 
 export async function downloadCourse(courseUrl: string) {

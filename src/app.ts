@@ -1,7 +1,7 @@
 import * as config from 'config';
 import { isLoggedIn, login } from './login';
-import { fetchAllCoursesAvailableToDownload, downloadCourse } from './download';
-import { ALL_COURSES_API, COURSE_URL_PREFIX } from './globals';
+import { fetchAllCoursesAvailableToDownload, fetchAllCoursesInPathToDownload, downloadCourse } from './download';
+import { ALL_COURSES_API, COURSE_URL_PREFIX, EDUCATIVE_BASE_URL } from './globals';
 import { getBrowser, closeBrowser } from './browser';
 
 const COURSE_URL: string = config.get('courseUrl');
@@ -44,6 +44,26 @@ async function main(): Promise<void> {
 
     for (const courseUrlSlug of courseUrlSlugList) {
       await downloadCourse(COURSE_URL_PREFIX + courseUrlSlug);
+    }
+    return;
+  }
+  if (COURSE_URL && COURSE_URL.includes('/path/')) {
+    console.log('Getting all the available courses in the path');
+
+    const courseUrlSlugList = await fetchAllCoursesInPathToDownload(COURSE_URL);
+
+    if (courseUrlSlugList.length < 1) {
+      console.log('No Courses Available to download.');
+      (await getBrowser()).close();
+      return;
+    }
+
+    console.log(`Found a total of ${courseUrlSlugList.length} courses to download.`);
+
+    console.log(`Downloading all the available courses now.`);
+
+    for (const courseUrlSlug of courseUrlSlugList) {
+      await downloadCourse(EDUCATIVE_BASE_URL + courseUrlSlug);
     }
   } else {
     await downloadCourse(COURSE_URL);
