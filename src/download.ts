@@ -3,7 +3,6 @@ import { isDireectoryExists, mkdir, writeFile, isFileExists } from './helpers';
 import { ROOT_PATH, HTTP_REQUEST_TIMEOUT, PageTitleAndLink, SAVE_LESSON_AS, AvailableCourses, BATCH_SIZE } from './globals';
 import { getPage, getSpecialBrowser } from './browser';
 import { Browser, Page } from 'puppeteer';
-const { exec } = require("child_process");
 
 const fs = require('fs').promises;
 
@@ -122,21 +121,16 @@ async function fetchLessonUrls(courseUrl: string): Promise<PageTitleAndLink[]> {
     let headings: string;
     if (document.location.pathname.includes('/module/')) {
       headings = Array.from(document.querySelectorAll('h6.mx-0.mt-0.mb-4')).map((item: HTMLElement) => item.innerText).join('\n');
+    } else {
+      headings = Array.from(document.querySelectorAll('h5')).map((item: HTMLElement) => item.innerText).join('\n');
     }
     
     return headings;
   });
-  await fs.writeFile(SAVE_DESTINATION + '/folders.txt', listHeadings, function (err: any, data: any) {
+  await fs.writeFile(SAVE_DESTINATION + '/folders.txt', listHeadings, function (err: any) {
     if (err) {
       return console.log(err);
     }
-    exec('args -I {} mkdir -p "{}" < folders.txt', function(error) {
-      if (error) {
-        console.log(`error: ${error.message}`);
-        return;
-      }
-    });
-    console.log(data);
   });
 
   console.log(`Total lessons: ${pageLinks.length}`);
