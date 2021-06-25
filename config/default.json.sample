@@ -1,0 +1,10 @@
+{
+    "email": "test@gmail.com",
+    "password": "test1",
+    "loginCheck": true,
+    "saveAs": "html",
+    "multiLanguage": false,
+    "headless": false,
+    "courseUrl": "https://www.educative.io/courses/grokking-adv-system-design-intvw",
+    "downloadAllCourses": false
+}

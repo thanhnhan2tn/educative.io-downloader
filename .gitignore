@@ -69,4 +69,5 @@ apidoc
 
 data
 downloads
-config
+config/cookie.json
+config/default.json
